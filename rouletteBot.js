@@ -1,4 +1,3 @@
-let isOn = false;
 let actualNum = getLastResultValue();
 let balance = getBalance();
 const redButton = document.querySelectorAll(".red_button")[0];
@@ -9,6 +8,7 @@ let betAmount = 1;
 let color = "red";
 let rouletteContainer = document.getElementById("select_roulette");
 let isFirstRender = true;
+let isFirstBet = true;
 let dashboard = getDashboardHTML();
 rouletteContainer.insertAdjacentHTML("afterbegin", dashboard);
 isFirstRender = false;
@@ -21,16 +21,12 @@ setInterval(() => {
         if (balance > getBalance()) {
             console.log("You lost!");
             if (isWorking) {
-                betAmount = betAmount * 2;
-                switchColors();  // Switch color
-                updateDashboard();  // Update dashboard to reflect color change
+                handleLose();
             }
         } else if (balance < getBalance()) {
             console.log("You won!");
             if (isWorking) {
-                betAmount = 1;
-                switchColors();  // Switch color
-                updateDashboard();  // Update dashboard to reflect color change
+                handleWin();
             }
         }
         balance = getBalance();
@@ -47,6 +43,33 @@ function getLastResultValue(){
     let result = lastItem.textContent;
     return result;
 };
+
+function resetBot(){
+    betAmount = 1;
+    startingBalance = getBalance();
+}
+
+function handleWin(){
+    betAmount = 1;
+    switchColors();
+    console.log("wont a bet");
+    setAmount(betAmount);
+    setTimeout(() => {
+        placeBet(color)
+    }, 10000);
+    updateDashboard();
+}
+
+function handleLose(){
+    betAmount = betAmount * 2;
+    switchColors();
+    console.log("lost a bet");
+    setAmount(betAmount);
+    setTimeout(() => {
+        placeBet(color)
+    }, 10000);
+    updateDashboard();
+}
 
 // changes the value of your bet
 
@@ -78,7 +101,6 @@ function getBalance(){
 }
 
 function switchColors(){
-    console.log("switching colors");
     if(color == "red"){
         color = "black";
     } else {
@@ -141,7 +163,12 @@ function getPowerBtnHTML(){
 
 function switchPower(){
     console.log("switched pwr");
-    isWorking = !isWorking;
+    if(!isWorking){
+        handleWin();
+        isWorking = !isWorking;
+    } else {
+        isWorking = !isWorking;
+    }
     updateDashboard();
 }
 
